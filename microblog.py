@@ -10,5 +10,6 @@ if __name__ == "__main__":
         debug=True,
         use_reloader=False,
         use_debugger=False,
-        passthrough_errors=True
+        passthrough_errors=True,
+        host='0.0.0.0'
     )
