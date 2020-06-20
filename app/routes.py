@@ -47,6 +47,7 @@ def login():
             flash('Invalid username or password')
             return redirect(url_for('login'))
 
+        user.set_session_token()
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
         if next_page is None or url_parse(next_page).netloc != '':
