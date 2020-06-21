@@ -1,5 +1,6 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from secrets import token_urlsafe
+from hashlib import md5
 from datetime import datetime
 from flask_login.mixins import UserMixin
 from app import db, login
@@ -13,6 +14,8 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     session_token = db.Column(db.String(43), index=True, unique=True)
     posts = db.relationship('Post', backref='author', lazy='dynamic')
+    about_me = db.Column(db.String(140))
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -29,6 +32,10 @@ class User(UserMixin, db.Model):
     def set_session_token(self):
         self.session_token = token_urlsafe()
         db.session.commit()
+
+    def avatar(self, size):
+        digest = md5(self.email.lower().encode('utf-8')).hexdigest()
+        return f'https://www.gravatar.com/avatar/{digest}?s={size}&d=retro'
 
 
 @login.user_loader
