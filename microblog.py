@@ -7,7 +7,7 @@ def make_shell_context():
 
 if __name__ == "__main__":
     app.run(
-        debug=True,
+        debug=False,
         use_reloader=False,
         use_debugger=False,
         passthrough_errors=True,
