@@ -13,3 +13,4 @@ class Config(object):
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     ADMINS = ['filipebzerra@gmail.com']
+    POSTS_PER_PAGE = os.getenv('POSTS_PER_PAGE') or 25

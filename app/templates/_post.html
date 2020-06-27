@@ -3,7 +3,16 @@
         <td><img src="{{ post.author.avatar(36) }}"></td>
         <td>
             <p>
-                {{ post.author.username }} says: <b>{{ post.body }}</b>
+                {% if current_user == post.author %}
+                I said
+                {% else %}
+                <a href="{{ url_for('user', username=post.author.username) }}">
+                    {{ post.author.username }}
+                </a>
+                says:
+                {% endif %}
+                <b>{{ post.body }}</b>
+                <small>on {{ post.timestamp }}</small>
             </p>
         </td>
     </tr>
