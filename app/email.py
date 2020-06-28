@@ -24,3 +24,13 @@ def send_password_reset_email(user):
         html_body=render_template('email/reset_password.html',
                                   user=user, token=token,
                                   expires_time=expires_time))
+
+
+def send_password_reset_confirmation_email(user):
+    send_email(sender=app.config['ADMINS'][0],
+               recipients=[user.email],
+               subject='[Microblog] Password Reset Confirmation',
+               text_body=render_template('email/password_reset_confirmation.txt',
+                                         user=user),
+               html_body=render_template('email/password_reset_confirmation.html',
+                                         user=user))
