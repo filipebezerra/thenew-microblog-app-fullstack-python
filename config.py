@@ -14,3 +14,4 @@ class Config(object):
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     ADMINS = ['filipebzerra@gmail.com']
     POSTS_PER_PAGE = os.getenv('POSTS_PER_PAGE') or 25
+    PASSWORD_RESET_EXPIRES_AT = os.getenv('PASSWORD_RESET_EXPIRES_AT') or 600
