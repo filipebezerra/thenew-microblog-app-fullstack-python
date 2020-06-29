@@ -1,12 +1,21 @@
 from flask_mail import email_dispatched
-from datetime import datetime, timezone
+from flask_login import user_logged_in, user_logged_out
 from app import app
+from app.logger import log_user_operation, log_email_operation
 
 
-def log_sending_email(message, app):
-    date = datetime.fromtimestamp(message.date, tz=timezone.utc)
-    app.logger.info(f'Email {message.subject} '
-                    f'sent at {date.strftime("%Y-%m-%dT%H:%M:%S,%f")}')
+def _after_sending_email_hook(message, app):
+    log_email_operation(message, 'sent')
 
 
-email_dispatched.connect(log_sending_email)
+email_dispatched.connect(_after_sending_email_hook)
+
+
+@user_logged_in.connect_via(app)
+def _after_user_logged_in_hook(sender, user, **extra):
+    log_user_operation(user, 'logged in')
+
+
+@user_logged_out.connect_via(app)
+def _after_user_logged_out_hook(sender, user, **extra):
+    log_user_operation(user, 'logged out')

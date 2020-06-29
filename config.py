@@ -15,3 +15,4 @@ class Config(object):
     ADMINS = ['filipebzerra@gmail.com']
     POSTS_PER_PAGE = os.getenv('POSTS_PER_PAGE') or 25
     PASSWORD_RESET_EXPIRES_AT = os.getenv('PASSWORD_RESET_EXPIRES_AT') or 600
+    DATE_TIME_FORMAT = os.getenv('DATE_TIME_FORMAT') or '%Y-%m-%dT%H:%M:%S,%f'
