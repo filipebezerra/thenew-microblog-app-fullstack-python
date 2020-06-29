@@ -182,7 +182,8 @@ def reset_password_request():
         user = User.query.filter_by(email=form.email.data).first()
         if user is not None:
             send_password_reset_email(user)
-        flash('Check your email for the instructions to reset your password')
+        flash('You will be receiving an email with the instructions to reset '
+              'your password.')
         return redirect(url_for('login'))
     return render_template('reset_password_request.html',
                            title='Reset Password', form=form)
