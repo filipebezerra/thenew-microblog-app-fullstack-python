@@ -1,0 +1,27 @@
+Flask extensions
+- flask-sqlalchemy
+- flask-migrate
+- flask-wtf
+- flask-cors
+- flask-login
+- flask-mail
+- flask-admin?
+- flask-user?
+- flask-security?
+
+itsdangerous ?
+
+more flask extensions?
+
+Application issues
+- Email Task Queue
+- Mail server blocking connections due to restrictions or limitations (https://github.com/mattupstate/flask-mail/issues/93)
+- Regarding the load times of the password reset feature, I am still noticing a small difference in speed after implementing the asynchronous send-method. This opens up our young web app for timing attacks, even though we only return a single message saying "check your email".
+An easy suggestion of how to fix this would be to start a new thread in both cases, when the email exists among our users and when it doesn't and let the thread figure out whether to send the mail or not.
+
+
+Implementations
+- Email when registered
+- Confirmation email/Block access until Confirmation
+- Revoke previous Password Reset Request tokens
+- https://blog.miguelgrinberg.com/post/oauth-authentication-with-flask

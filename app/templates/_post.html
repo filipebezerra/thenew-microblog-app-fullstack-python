@@ -1,18 +1,23 @@
-<table>
-    <tr valign="middle">
-        <td><img src="{{ post.author.avatar(36) }}"></td>
+<table class="table table-hover">
+    <tr>
+        {% set user_url  = url_for('user', username=post.author.username) %}
+        <td width="70px">
+            <a href="{{ user_url }}">
+                <img src="{{ post.author.avatar(70) }}">
+            </a>
+        </td>
         <td>
             <p>
                 {% if current_user == post.author %}
                 I said
                 {% else %}
-                <a href="{{ url_for('user', username=post.author.username) }}">
+                <a href="{{ user_url }}">
                     {{ post.author.username }}
                 </a>
                 says:
                 {% endif %}
                 <b>{{ post.body }}</b>
-                <small>on {{ post.timestamp }}</small>
+                <i>on {{ post.timestamp }}</i>
             </p>
         </td>
     </tr>

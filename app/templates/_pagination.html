@@ -1,14 +1,14 @@
-{% if prev_url or next_url %}
-<p>
-    {% if prev_url %}
-    <a href="{{ prev_url }}">Older posts</a>
-    {% else %}
-    <span style="cursor: not-allowed;">Older posts</span>
-    {% endif %}
-    {% if next_url %}
-    <a href="{{ next_url }}">Newer posts</a>
-    {% else %}
-    <span style="cursor: not-allowed;">Newer posts</span>
-    {% endif %}
-</p>
-{% endif %}
+<nav aria-label="...">
+    <ul class="pager">
+        <li class="previous{% if not prev_url %} disabled{% endif %}">
+            <a href="{{ prev_url or '#' }}">
+                <span aria-hidden="true">&larr;</span> Older posts
+            </a>
+        </li>
+        <li class="next{% if not next_url %} disabled{% endif %}">
+            <a href="{{ next_url or '#' }}">
+                <span aria-hidden="true">&rarr;</span> Newer posts
+            </a>
+        </li>
+    </ul>
+</nav>
