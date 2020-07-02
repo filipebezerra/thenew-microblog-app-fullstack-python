@@ -17,7 +17,7 @@
                 says:
                 {% endif %}
                 <b>{{ post.body }}</b>
-                <i>on {{ post.timestamp }}</i>
+                <i>on {{ moment(post.timestamp).fromNow(refresh=True) }}</i>
             </p>
         </td>
     </tr>
