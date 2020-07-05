@@ -16,3 +16,4 @@ class Config(object):
     POSTS_PER_PAGE = os.getenv('POSTS_PER_PAGE') or 10
     PASSWORD_RESET_EXPIRES_AT = os.getenv('PASSWORD_RESET_EXPIRES_AT') or 600
     DATE_TIME_FORMAT = os.getenv('DATE_TIME_FORMAT') or '%Y-%m-%dT%H:%M:%S,%f'
+    LANGUAGES = ['en_US', 'es', 'pt_BR']

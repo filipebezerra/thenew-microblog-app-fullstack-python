@@ -7,13 +7,13 @@
                 <img src="{{ user.avatar(256) }}">
             </td>
             <td>
-                <h1>User: {{ user.username }}</h1>
+                <h1>{{ _('User: %(username)s', username=user.username) }}</h1>
                 {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
-                {% if user.last_seen %}<p>Last seen on: {{ moment(user.last_seen).format('LLL', refresh=True) }}</p>{% endif %}
-                <p>{{ user.followers.count() }} followers, {{ user.followed.count() }} following</p>
+                {% if user.last_seen %}<p>{{ _('Last seen on: %(when)s', when=moment(user.last_seen).format('LLL', refresh=True)) }}</p>{% endif %}
+                <p>{{ _('%(followers)d followers, %(following)d following', followers=user.followers.count(), following=user.followed.count()) }}</p>
                 {% if user == current_user %}
                 <p>
-                    <a href="{{ url_for('edit_profile') }}">Edit your profile</a>
+                    <a href="{{ url_for('edit_profile') }}">{{ _('Edit your profile') }}</a>
                 </p>
                 {% elif not current_user.is_following(user) %}
                 <p>

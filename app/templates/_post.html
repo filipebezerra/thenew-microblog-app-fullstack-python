@@ -8,16 +8,13 @@
         </td>
         <td>
             <p>
-                {% if current_user == post.author %}
-                I said
-                {% else %}
-                <a href="{{ user_url }}">
-                    {{ post.author.username }}
-                </a>
-                says:
-                {% endif %}
+                {% set user_link %}
+                <a href="{{ user_url }}">{{ post.author.username }}</a>
+                {% endset %}
+                {% set who_said = _('I') if current_user == post.author else user_link  %}
+                {{ _('%(username)s said', username=who_said) }}
                 <b>{{ post.body }}</b>
-                <i>on {{ moment(post.timestamp).fromNow(refresh=True) }}</i>
+                <i>{{ moment(post.timestamp).fromNow(refresh=True) }}</i>
             </p>
         </td>
     </tr>

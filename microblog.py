@@ -1,4 +1,4 @@
-from app import app
+from app import app, cli
 from app.models import db, User, Post
 
 
@@ -9,9 +9,8 @@ def make_shell_context():
 
 if __name__ == "__main__":
     app.run(
-        # debug=False,
-        # use_reloader=False,
-        # use_debugger=False,
+        use_reloader=False,
+        use_debugger=False,
         passthrough_errors=True,
         host='0.0.0.0'
     )
