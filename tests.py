@@ -79,10 +79,10 @@ class UserModelCase(unittest.TestCase):
         db.session.commit()
 
         # check the followed posts of each user
-        posts_sophia = sophia.followed_posts().all()
-        posts_valentina = valentina.followed_posts().all()
-        posts_lavinia = lavinia.followed_posts().all()
-        posts_antonella = antonella.followed_posts().all()
+        posts_sophia = sophia.followed_posts.all()
+        posts_valentina = valentina.followed_posts.all()
+        posts_lavinia = lavinia.followed_posts.all()
+        posts_antonella = antonella.followed_posts.all()
         self.assertListEqual(
             posts_sophia, [lavinia_post, valentina_post, sophia_post])
         self.assertListEqual(posts_valentina, [lavinia_post, valentina_post])
