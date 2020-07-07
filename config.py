@@ -17,3 +17,5 @@ class Config(object):
     PASSWORD_RESET_EXPIRES_AT = os.getenv('PASSWORD_RESET_EXPIRES_AT') or 600
     DATE_TIME_FORMAT = os.getenv('DATE_TIME_FORMAT') or '%Y-%m-%dT%H:%M:%S,%f'
     LANGUAGES = ['en_US', 'es', 'pt_BR']
+    MS_TRANSLATOR_KEY = os.getenv('MS_TRANSLATOR_KEY')
+    MS_TRANSLATOR_REGION = os.getenv('MS_TRANSLATOR_REGION')

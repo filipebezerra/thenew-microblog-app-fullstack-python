@@ -13,7 +13,20 @@
                 {% endset %}
                 {% set who_said = _('I') if current_user == post.author else user_link  %}
                 {{ _('%(username)s said', username=who_said) }}
-                <b>{{ post.body }}</b>
+                <b>
+                    <span id="post{{ post.id }}">
+                        {{ post.body }}
+                    </span>
+                </b>
+                {% if post.language and not g.locale.startswith(post.language)  %}
+                    <span id="translation{{ post.id }}">
+                        <a href="javascript:translate(
+                            '#post{{ post.id }}',
+                            '#translation{{ post.id }}',
+                            '{{ post.language }}',
+                            '{{ g.locale }}');">{{ _('Translate') }}</a>
+                    </span>
+                {% endif %}
                 <i>{{ moment(post.timestamp).fromNow(refresh=True) }}</i>
             </p>
         </td>
