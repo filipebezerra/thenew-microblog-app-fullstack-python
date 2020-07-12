@@ -1,6 +1,6 @@
 <table class="table table-hover">
     <tr>
-        {% set user_url  = url_for('user', username=post.author.username) %}
+        {% set user_url  = url_for('main.user', username=post.author.username) %}
         <td width="70px">
             <a href="{{ user_url }}">
                 <img src="{{ post.author.avatar(70) }}">

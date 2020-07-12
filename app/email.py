@@ -1,6 +1,7 @@
 from threading import Thread
+from flask import current_app
 from flask_mail import Message
-from app import mail, app
+from app import mail
 
 
 def send_async_email(app, msg):
@@ -11,4 +12,5 @@ def send_async_email(app, msg):
 def send_email(sender, recipients, subject, text_body, html_body):
     msg = Message(sender=sender, recipients=recipients,
                   subject=subject, body=text_body,  html=html_body)
-    Thread(target=send_async_email, args=(app, msg)).start()
+    Thread(target=send_async_email,
+           args=(current_app._get_current_object(), msg)).start()
