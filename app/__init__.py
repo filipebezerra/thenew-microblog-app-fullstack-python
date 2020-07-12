@@ -19,7 +19,7 @@ login.login_view = 'auth.login'
 login.login_message = _l('Please log in to access this page.')
 mail = Mail()
 bootstrap = Bootstrap()
-moment =  Moment()
+moment = Moment()
 babel = Babel()
 
 
@@ -35,20 +35,21 @@ def create_app(config_class=Config):
     moment.init_app(app)
     babel.init_app(app)
 
-    from app.main import bp as main_blueprint
-    app.register_blueprint(main_blueprint)
-
     from app.errors import bp as errors_blueprint
     app.register_blueprint(errors_blueprint)
 
     from app.auth import bp as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
+    from app.main import bp as main_blueprint
+    app.register_blueprint(main_blueprint)
+
     if not app.debug and not app.testing:
         if app.config['MAIL_SERVER']:
             auth = None
             if app.config['MAIL_USERNAME'] or app.config['MAIL_PASSWORD']:
-                auth = (app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD'])
+                auth = (app.config['MAIL_USERNAME'],
+                        app.config['MAIL_PASSWORD'])
             secure = None
             if app.config['MAIL_USE_TLS']:
                 secure = ()
@@ -66,7 +67,7 @@ def create_app(config_class=Config):
         if not os.path.exists('logs'):
             os.mkdir('logs')
         file_handler = RotatingFileHandler('logs/microblog.log',
-                                        maxBytes=10240, backupCount=10)
+                                           maxBytes=10240, backupCount=10)
         file_handler.setLevel(logging.INFO)
         file_handler.setFormatter(logging.Formatter(
             '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
