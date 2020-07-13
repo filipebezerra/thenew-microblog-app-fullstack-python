@@ -11,7 +11,7 @@ from app.main import bp
 from app.main.forms import EditProfileForm, EmptyForm, PostForm
 
 
-@bp.before_request
+@bp.before_app_request
 def before_request():
     if current_user.is_authenticated:
         current_user.last_seen = datetime.utcnow()
