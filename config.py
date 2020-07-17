@@ -23,6 +23,7 @@ class Config(object):
     LANGUAGES = ['en_US', 'es', 'pt_BR']
     MS_TRANSLATOR_KEY = os.getenv('MS_TRANSLATOR_KEY')
     MS_TRANSLATOR_REGION = os.getenv('MS_TRANSLATOR_REGION')
+    ELASTICSEARCH_URL = os.getenv('ELASTICSEARCH_URL')
 
 
 class TestConfig(Config):

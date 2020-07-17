@@ -39,3 +39,5 @@ venv
 app.db
 microblog.log*
 .env
+
+notes/
