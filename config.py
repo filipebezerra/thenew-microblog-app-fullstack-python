@@ -24,6 +24,7 @@ class Config(object):
     MS_TRANSLATOR_KEY = os.getenv('MS_TRANSLATOR_KEY')
     MS_TRANSLATOR_REGION = os.getenv('MS_TRANSLATOR_REGION')
     ELASTICSEARCH_URL = os.getenv('ELASTICSEARCH_URL')
+    LOG_TO_STDOUT = os.getenv('LOG_TO_STDOUT')
 
 
 class TestConfig(Config):
