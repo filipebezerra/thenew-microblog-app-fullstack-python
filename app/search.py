@@ -9,6 +9,7 @@ def add_to_index(index, model):
         payload[field] = getattr(model, field)
     if payload is None:
         return
+    current_app.elasticsearch.indices.create(index=index, ignore=400)
     current_app.elasticsearch.index(index=index, id=model.id, body=payload)
 
 
