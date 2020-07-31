@@ -5,6 +5,8 @@ RUN adduser -D microblog
 WORKDIR /home/microblog
 
 COPY requirements requirements
+RUN apk update && apk upgrade
+RUN apk add gcc musl-dev python3-dev libffi-dev openssl-dev
 RUN python -m venv venv
 RUN venv/bin/pip install -U pip
 RUN venv/bin/pip install -r requirements/docker.txt
