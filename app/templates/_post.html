@@ -9,7 +9,9 @@
         <td>
             <p>
                 {% set user_link %}
-                <a href="{{ user_url }}">{{ post.author.username }}</a>
+                    <span class="user_popup">
+                        <a href="{{ user_url }}">{{ post.author.username }}</a>
+                    </span>
                 {% endset %}
                 {% set who_said = _('I') if current_user == post.author else user_link  %}
                 {{ _('%(username)s said', username=who_said) }}
