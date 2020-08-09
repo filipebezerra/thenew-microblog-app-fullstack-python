@@ -68,11 +68,22 @@ class User(UserMixin, db.Model):
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
-    followed = db.relationship(
-        'User', secondary=followers,
-        primaryjoin=(followers.c.follower_id == id),
-        secondaryjoin=(followers.c.followed_id == id),
-        backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
+    followed = db.relationship('User',
+                               secondary=followers,
+                               primaryjoin=(followers.c.follower_id == id),
+                               secondaryjoin=(followers.c.followed_id == id),
+                               backref=db.backref(
+                                   'followers', lazy='dynamic'),
+                               lazy='dynamic')
+    messages_sent = db.relationship('Message',
+                                    foreign_keys='Message.sender_id',
+                                    backref='author',
+                                    lazy='dynamic')
+    messages_received = db.relationship('Message',
+                                        foreign_keys='Message.recipient_id',
+                                        backref='recipient',
+                                        lazy='dynamic')
+    last_message_read_time = db.Column(db.DateTime)
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -131,6 +142,12 @@ class User(UserMixin, db.Model):
             return
         return User.query.get(user_id)
 
+    def new_messages(self):
+        last_read_time = self.last_message_read_time or \
+            datetime(1900, 1, 1)
+        return Message.query.filter_by(recipient=self).filter(
+            Message.timestamp > last_read_time).count()
+
 
 @login.user_loader
 def load_user(session_token):
@@ -147,7 +164,20 @@ class Post(SearchableMixin, db.Model):
     language = db.Column(db.String(5))
 
     def __repr__(self):
-        return f'<Post {self.body}>'
+        return f'<Post {self.body}, author={self.author}>'
+
+
+class Message(db.Model):
+    __tablename__ = 'messages'
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    recipient_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    body = db.Column(db.String(140), nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False,
+                          index=True, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Message {self.body}, author={self.author}>'
 
 
 db.event.listen(db.session, 'before_commit', SearchableMixin.before_commit)

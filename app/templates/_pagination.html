@@ -1,6 +1,4 @@
-{% set pagination_text %}
-    {{ _('results') if g.search_form and g.search_form.q.data else _('posts') }}
-{% endset %}
+{% set pagination_text = pagination_text if pagination_text else _('posts') %}
 <nav aria-label="...">
     <ul class="pager">
         <li class="previous{% if not prev_url %} disabled{% endif %}">

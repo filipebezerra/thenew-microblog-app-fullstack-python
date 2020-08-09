@@ -1,14 +1,16 @@
-from datetime import datetime
+from datetime import date, datetime
 from flask import render_template, flash, redirect, url_for, request, g, \
     jsonify, current_app
 from flask_login import current_user, login_required
 from flask_babel import _, get_locale
 from guess_language import guess_language
 from app import db
-from app.models import User, Post
+from app.models import User, Post, Message
 from app.translate import translate
 from app.main import bp
-from app.main.forms import EditProfileForm, EmptyForm, PostForm, SearchForm
+from app.date import now
+from app.main.forms import EditProfileForm, EmptyForm, PostForm, SearchForm, \
+    MessageForm
 
 
 @bp.before_app_request
@@ -168,3 +170,37 @@ def search():
         if page > 1 else None
     return render_template('search.html', title=_('Search'), posts=posts,
                            prev_url=prev_url, next_url=next_url)
+
+
+@bp.route('/send_message/<recipient>', methods=['GET', 'POST'])
+@login_required
+def send_message(recipient):
+    user = User.query.filter_by(username=recipient).first_or_404()
+    form = MessageForm()
+    if form.validate_on_submit():
+        message = Message(author=current_user, recipient=user,
+                          body=form.message.data)
+        db.session.add(message)
+        db.session.commit()
+        flash(_('Your message has been sent'))
+        return redirect(url_for('main.user', username=recipient))
+    return render_template('send_message.html', form=form,
+                           title=_('Send Message'), recipient=recipient)
+
+
+@bp.route('/messages')
+@login_required
+def messages():
+    current_user.last_message_read_time = now()
+    db.session.commit()
+    page = request.args.get('page', 1, type=int)
+    messages = current_user.messages_received.order_by(
+        Message.timestamp.desc()).paginate(
+            page, current_app.config['POSTS_PER_PAGE'], False)
+    prev_url = url_for('main.messages', page=messages.prev_num) \
+        if messages.has_prev else None
+    next_url = url_for('main.messages', page=messages.next_num) \
+        if messages.has_next else None
+    return render_template('messages.html', messages=messages.items,
+                           title=_('Messages'), prev_url=prev_url,
+                           next_url=next_url)

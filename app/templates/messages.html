@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-    <h1>{{ _('Search Results') }}</h1>
-    {% for post in posts %}
+    <h1>{{ _('Messages') }}</h1>
+    {% for post in messages %}
         {% include '_post.html' %}
     {% endfor %}
-    {% set pagination_text = _('results') %}
+    {% set pagination_text = _('messages') %}
     {% include '_pagination.html' %}
 {% endblock %}
