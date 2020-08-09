@@ -1,4 +1,5 @@
 import jwt
+import json
 from secrets import token_urlsafe
 from hashlib import md5
 from datetime import datetime
@@ -84,6 +85,8 @@ class User(UserMixin, db.Model):
                                         backref='recipient',
                                         lazy='dynamic')
     last_message_read_time = db.Column(db.DateTime)
+    notifications = db.relationship('Notification', backref='user',
+                                    lazy='dynamic')
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -148,6 +151,12 @@ class User(UserMixin, db.Model):
         return Message.query.filter_by(recipient=self).filter(
             Message.timestamp > last_read_time).count()
 
+    def add_notification(self, name, data):
+        self.notifications.filter_by(name=name).delete()
+        n = Notification(name=name, user=self, payload_json=json.dumps(data))
+        db.session.add(n)
+        return n
+
 
 @login.user_loader
 def load_user(session_token):
@@ -178,6 +187,18 @@ class Message(db.Model):
 
     def __repr__(self):
         return f'<Message {self.body}, author={self.author}>'
+
+
+class Notification(db.Model):
+    __tablename__ = 'notifications'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), nullable=False, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    timestamp = db.Column(db.Float, nullable=False, index=True, default=time)
+    payload_json = db.Column(db.Text, nullable=False)
+
+    def get_data(self):
+        return json.loads(str(self.payload_json))
 
 
 db.event.listen(db.session, 'before_commit', SearchableMixin.before_commit)

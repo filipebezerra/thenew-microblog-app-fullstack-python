@@ -1,11 +1,11 @@
-from datetime import date, datetime
+from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request, g, \
     jsonify, current_app
 from flask_login import current_user, login_required
 from flask_babel import _, get_locale
 from guess_language import guess_language
 from app import db
-from app.models import User, Post, Message
+from app.models import User, Post, Message, Notification
 from app.translate import translate
 from app.main import bp
 from app.date import now
@@ -181,6 +181,7 @@ def send_message(recipient):
         message = Message(author=current_user, recipient=user,
                           body=form.message.data)
         db.session.add(message)
+        user.add_notification("unread_message_count", user.new_messages())
         db.session.commit()
         flash(_('Your message has been sent'))
         return redirect(url_for('main.user', username=recipient))
@@ -192,6 +193,7 @@ def send_message(recipient):
 @login_required
 def messages():
     current_user.last_message_read_time = now()
+    current_user.add_notification("unread_message_count", 0)
     db.session.commit()
     page = request.args.get('page', 1, type=int)
     messages = current_user.messages_received.order_by(
@@ -204,3 +206,16 @@ def messages():
     return render_template('messages.html', messages=messages.items,
                            title=_('Messages'), prev_url=prev_url,
                            next_url=next_url)
+
+
+@bp.route('/notifications')
+@login_required
+def notifications():
+    since = request.args.get('since', 0.0, type=float)
+    notifications = current_user.notifications.filter(
+        Notification.timestamp > since).order_by(Notification.timestamp.asc())
+    return jsonify([{
+        'name': n.name,
+        'data': n.get_data(),
+        'timestamp': n.timestamp
+    } for n in notifications])
