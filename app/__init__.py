@@ -10,6 +10,8 @@ from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_babel import Babel, lazy_gettext as _l
 from elasticsearch import Elasticsearch
+from redis.client import Redis
+import rq
 from config import Config
 
 
@@ -48,6 +50,10 @@ def create_app(config_class=Config):
     app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) \
         if app.config['ELASTICSEARCH_URL'] else None
 
+    app.redis = Redis.from_url(app.config['REDIS_URL'])
+    app.task_queue = rq.Queue(app.config['MICROBLOG_QUEUE_NAME'],
+                              connection=app.redis)
+
     if not app.debug and not app.testing:
         if app.config['MAIL_SERVER']:
             auth = None
@@ -76,7 +82,7 @@ def create_app(config_class=Config):
             if not os.path.exists('logs'):
                 os.mkdir('logs')
             file_handler = RotatingFileHandler('logs/microblog.log',
-                                            maxBytes=10240, backupCount=10)
+                                               maxBytes=10240, backupCount=10)
             file_handler.setLevel(logging.INFO)
             file_handler.setFormatter(logging.Formatter(
                 '%(asctime)s %(levelname)s: %(message)s '

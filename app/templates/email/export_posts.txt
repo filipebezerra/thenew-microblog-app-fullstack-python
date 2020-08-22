@@ -1,0 +1,7 @@
+Hi {{ user.username }},
+
+Here's attached the archive of your posts that you requested.
+
+Sincerely,
+
+The Microblog Team

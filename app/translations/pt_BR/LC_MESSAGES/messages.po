@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-08-08 21:56-0300\n"
+"POT-Creation-Date: 2020-08-21 20:30-0300\n"
 "PO-Revision-Date: 2020-07-04 22:41-0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: pt_BR\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: app/__init__.py:20
+#: app/__init__.py:22
 msgid "Please log in to access this page."
 msgstr "Por favor faça login para acessar esta página."
 
@@ -159,18 +159,26 @@ msgstr "Você não pode deixar de seguir a si mesmo!"
 msgid "You unfollowed %(username)s"
 msgstr "Você deixou de seguir %(username)s"
 
-#: app/main/routes.py:185
+#: app/main/routes.py:186
 msgid "Your message has been sent"
 msgstr "Sua mensagem foi enviada"
 
-#: app/main/routes.py:188
+#: app/main/routes.py:189
 msgid "Send Message"
 msgstr "Enviar Mensagem"
 
-#: app/main/routes.py:205 app/templates/base.html:28
+#: app/main/routes.py:207 app/templates/base.html:30
 #: app/templates/messages.html:4
 msgid "Messages"
 msgstr "Mensagens"
+
+#: app/main/routes.py:228
+msgid "An export task is currently in progress"
+msgstr "Uma tarefa de exportação está em andamento"
+
+#: app/main/routes.py:230
+msgid "Exporting your posts..."
+msgstr "Exportando suas postagens..."
 
 #: app/templates/_pagination.html:1
 msgid "posts"
@@ -219,15 +227,15 @@ msgstr "Explorar"
 msgid "Login"
 msgstr "Entrar"
 
-#: app/templates/base.html:29
+#: app/templates/base.html:38
 msgid "Profile"
 msgstr "Perfil"
 
-#: app/templates/base.html:30
+#: app/templates/base.html:39
 msgid "Logout"
 msgstr "Sair"
 
-#: app/templates/base.html:73
+#: app/templates/base.html:95
 msgid "Error: Could not contact server."
 msgstr "Erro: Não foi possível comunicar com o servidor."
 
@@ -281,7 +289,11 @@ msgstr "%(followers)d seguidores"
 msgid "Edit your profile"
 msgstr "Editar seu perfil"
 
-#: app/templates/user.html:43
+#: app/templates/user.html:28
+msgid "Export your posts"
+msgstr "Exportar suas postagens"
+
+#: app/templates/user.html:50
 msgid "Send private message"
 msgstr "Enviar mensagem privada"
 
@@ -323,4 +335,7 @@ msgstr "Enviar mensagem privada"
 
 #~ msgid "%(followers)d followers, %(following)d following"
 #~ msgstr "%(followers)d seguidores, %(following)d seguindo"
+
+#~ msgid "An export posts is currently in progress"
+#~ msgstr ""
 

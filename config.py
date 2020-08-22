@@ -25,6 +25,9 @@ class Config(object):
     MS_TRANSLATOR_REGION = os.getenv('MS_TRANSLATOR_REGION')
     ELASTICSEARCH_URL = os.getenv('ELASTICSEARCH_URL')
     LOG_TO_STDOUT = os.getenv('LOG_TO_STDOUT')
+    REDIS_URL = os.getenv('REDIS_URL') or 'redis://'
+    MICROBLOG_QUEUE_NAME = os.getenv('MICROBLOG_QUEUE_NAME') or \
+        'microblog-tasks'
 
 
 class TestConfig(Config):

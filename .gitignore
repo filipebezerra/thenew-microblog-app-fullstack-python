@@ -36,6 +36,7 @@ nosetests.xml
 .pydevproject
 
 venv
+venv-wsl
 app.db
 microblog.log*
 .env

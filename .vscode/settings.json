@@ -4,5 +4,6 @@
   "python.testing.nosetestsEnabled": false,
   "python.testing.unittestEnabled": true,
   "python.pythonPath": "venv\\Scripts\\python.exe",
+  "python.venvPath": ".\\venv, .\\venv-wsl",
   "html.format.enable": false
 }

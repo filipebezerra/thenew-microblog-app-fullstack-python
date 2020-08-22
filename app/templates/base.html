@@ -53,6 +53,19 @@
 
 {% block content %}
     <div class="container">
+        {% if current_user.is_authenticated %}
+        {% with tasks = current_user.get_tasks_in_progress() %}
+        {% if tasks %}
+            {% for task in tasks %}
+            <div class="alert alert-success" role="alert">
+                {{ task.description }}
+                <span id="{{ task.id }}-progress">{{ task.get_progress() }}</span>%
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+        {% endif %}
+
         {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
@@ -122,9 +135,13 @@
             )
         });
 
-        function updateMessageCount(messageCount) {
-            $('#message-count').text(messageCount);
-            $('#message-count').css('visibility', messageCount ? 'visible' : 'hidden');
+        function updateMessageCount({data}) {
+            $('#message-count').text(data);
+            $('#message-count').css('visibility', data ? 'visible' : 'hidden');
+        }
+
+        function setTaskProgress({task_id, progress}) {
+            $(`#${task_id}-progress`).text(progress);
         }
 
         {% if current_user.is_authenticated %}
@@ -134,9 +151,16 @@
                 $.ajax(`{{ url_for('main.notifications') }}?since=${since}`).done(
                     function(notifications) {
                         for (let i = 0; i < notifications.length; i++) {
-                            if (notifications[i].name == 'unread_message_count')
-                                updateMessageCount(notifications[i].data);
-                            since = notifications[i].timestamp;
+                            const notification = notifications[i];
+                            switch (notification.name) {
+                                case 'unread_message_count':
+                                    updateMessageCount(notification);
+                                    break;
+                                case 'task_progress':
+                                    setTaskProgress(notification.data);
+                                    break;
+                            }
+                            since = notification.timestamp;
                         }
                     }
                 );
