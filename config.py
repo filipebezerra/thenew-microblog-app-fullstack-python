@@ -28,6 +28,8 @@ class Config(object):
     REDIS_URL = os.getenv('REDIS_URL') or 'redis://'
     MICROBLOG_QUEUE_NAME = os.getenv('MICROBLOG_QUEUE_NAME') or \
         'microblog-tasks'
+    ITEMS_PER_REQUEST = os.getenv('ITEMS_PER_PAGE') or 10
+    MAX_RESULTS_PER_REQUEST = os.getenv('MAX_RESULTS_PER_REQUEST') or 100
 
 
 class TestConfig(Config):

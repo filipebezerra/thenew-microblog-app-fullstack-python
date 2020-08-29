@@ -14,7 +14,6 @@ from redis.client import Redis
 import rq
 from config import Config
 
-
 db = SQLAlchemy()
 migrate = Migrate()
 login = LoginManager()
@@ -47,6 +46,9 @@ def create_app(config_class=Config):
     from app.main import bp as main_blueprint
     app.register_blueprint(main_blueprint)
 
+    from app.api import bp as api_bp
+    app.register_blueprint(api_bp, url_prefix='/api')
+
     app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) \
         if app.config['ELASTICSEARCH_URL'] else None
 
@@ -69,8 +71,7 @@ def create_app(config_class=Config):
                 toaddrs=app.config['ADMINS'],
                 subject='[Microblog] Failure',
                 credentials=auth,
-                secure=secure
-            )
+                secure=secure)
             mail_handler.setLevel(logging.ERROR)
             app.logger.addHandler(mail_handler)
 
@@ -82,11 +83,12 @@ def create_app(config_class=Config):
             if not os.path.exists('logs'):
                 os.mkdir('logs')
             file_handler = RotatingFileHandler('logs/microblog.log',
-                                               maxBytes=10240, backupCount=10)
+                                               maxBytes=10240,
+                                               backupCount=10)
             file_handler.setLevel(logging.INFO)
-            file_handler.setFormatter(logging.Formatter(
-                '%(asctime)s %(levelname)s: %(message)s '
-                '[in %(pathname)s:%(lineno)d]'))
+            file_handler.setFormatter(
+                logging.Formatter('%(asctime)s %(levelname)s: %(message)s '
+                                  '[in %(pathname)s:%(lineno)d]'))
             app.logger.addHandler(file_handler)
 
         app.logger.setLevel(logging.INFO)
