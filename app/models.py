@@ -1,8 +1,10 @@
+import base64
+import os
 import jwt
 import json
 from secrets import token_urlsafe
 from hashlib import md5
-from datetime import datetime
+from datetime import datetime, timedelta
 from time import time
 import redis
 import rq
@@ -11,13 +13,13 @@ from flask import current_app, url_for
 from flask_login.mixins import UserMixin
 from app import db, login
 from app.search import add_to_index, remove_from_index, query_index
+from app.date import now, with_utc
 
 
 class SearchableMixin(object):
     @classmethod
     def search(cls, expression, page, per_page):
-        ids, total = query_index(
-            cls.__tablename__, expression, page, per_page)
+        ids, total = query_index(cls.__tablename__, expression, page, per_page)
         if total == 0:
             return cls.query.filter_by(id=0), 0
         when = []
@@ -66,23 +68,23 @@ class PaginatedAPIMixin(object):
                 'total_items': resources.total
             },
             '_links': {
-                'self': url_for(endpoint, page=page, per_page=per_page,
-                                **kwargs),
-                'next': url_for(endpoint, page=page + 1, per_page=per_page,
-                                **kwargs) if resources.has_next else None,
-                'prev': url_for(endpoint, page=page - 1, per_page=per_page,
-                                **kwargs) if resources.has_prev else None
+                'self':
+                url_for(endpoint, page=page, per_page=per_page, **kwargs),
+                'next':
+                url_for(endpoint, page=page + 1, per_page=per_page, **kwargs)
+                if resources.has_next else None,
+                'prev':
+                url_for(endpoint, page=page - 1, per_page=per_page, **kwargs)
+                if resources.has_prev else None
             }
         }
         return data
 
 
-followers = db.Table('followers',
-                     db.Column('follower_id', db.Integer,
-                               db.ForeignKey('users.id')),
-                     db.Column('followed_id', db.Integer,
-                               db.ForeignKey('users.id'))
-                     )
+followers = db.Table(
+    'followers', db.Column('follower_id', db.Integer,
+                           db.ForeignKey('users.id')),
+    db.Column('followed_id', db.Integer, db.ForeignKey('users.id')))
 
 
 class User(PaginatedAPIMixin, UserMixin, db.Model):
@@ -99,8 +101,7 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
                                secondary=followers,
                                primaryjoin=(followers.c.follower_id == id),
                                secondaryjoin=(followers.c.followed_id == id),
-                               backref=db.backref(
-                                   'followers', lazy='dynamic'),
+                               backref=db.backref('followers', lazy='dynamic'),
                                lazy='dynamic')
     messages_sent = db.relationship('Message',
                                     foreign_keys='Message.sender_id',
@@ -111,9 +112,12 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
                                         backref='recipient',
                                         lazy='dynamic')
     last_message_read_time = db.Column(db.DateTime)
-    notifications = db.relationship('Notification', backref='user',
+    notifications = db.relationship('Notification',
+                                    backref='user',
                                     lazy='dynamic')
     tasks = db.relationship('Task', backref='user', lazy='dynamic')
+    token = db.Column(db.String(32), index=True, unique=True)
+    token_expiration = db.Column(db.DateTime)
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -158,15 +162,19 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
     def get_reset_password_token(self):
         expires_at = time() + \
             int(current_app.config['PASSWORD_RESET_EXPIRES_AT'])
-        token = jwt.encode(
-            {'reset_password': self.id, 'exp': expires_at},
-            current_app.config['SECRET_KEY'], algorithm='HS256')
+        token = jwt.encode({
+            'reset_password': self.id,
+            'exp': expires_at
+        },
+                           current_app.config['SECRET_KEY'],
+                           algorithm='HS256')
         return token.decode('utf-8')
 
     @staticmethod
     def verify_reset_password_token(token):
         try:
-            user_id = jwt.decode(token, current_app.config['SECRET_KEY'],
+            user_id = jwt.decode(token,
+                                 current_app.config['SECRET_KEY'],
                                  algorithms=['HS256'])['reset_password']
         except:
             return
@@ -188,7 +196,9 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
         rq_job = current_app.task_queue.enqueue('app.tasks.' + name, self.id,
                                                 *args, **kwargs)
 
-        task = Task(id=rq_job.get_id(), name=name, description=description,
+        task = Task(id=rq_job.get_id(),
+                    name=name,
+                    description=description,
                     user=self)
         db.session.add(task)
         return task
@@ -197,8 +207,8 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
         return Task.query.filter_by(user=self, complete=False).all()
 
     def get_task_in_progress(self, name):
-        return Task.query.filter_by(name=name, user=self, complete=False
-                                    ).first()
+        return Task.query.filter_by(name=name, user=self,
+                                    complete=False).first()
 
     def to_dict(self, include_email=False):
         data = {
@@ -227,6 +237,25 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
         if new_user:
             self.set_password(data['password'])
 
+    def get_token(self, expires_in=3600):
+        if self.token and with_utc(
+                self.token_expiration) > now() + timedelta(seconds=60):
+            return self.token
+        self.token = base64.b64encode(os.urandom(24)).decode('utf-8')
+        self.token_expiration = now() + timedelta(seconds=expires_in)
+        db.session.add(self)
+        return self.token
+
+    def revoke_token(self):
+        self.token_expiration = now() - timedelta(seconds=1)
+
+    @staticmethod
+    def check_token(token):
+        user = User.query.filter_by(token=token).first()
+        if user is None or with_utc(user.token_expiration) < now():
+            return None
+        return user
+
 
 @login.user_loader
 def load_user(session_token):
@@ -252,8 +281,10 @@ class Message(db.Model):
     sender_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     recipient_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     body = db.Column(db.String(140), nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False,
-                          index=True, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime,
+                          nullable=False,
+                          index=True,
+                          default=datetime.utcnow)
 
     def __repr__(self):
         return f'<Message {self.body}, author={self.author}>'

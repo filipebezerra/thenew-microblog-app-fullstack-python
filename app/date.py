@@ -7,3 +7,7 @@ def fromtimestamp(timestamp):
 
 def now():
     return datetime.now(tz=timezone.utc)
+
+
+def with_utc(datetime):
+    return datetime.replace(tzinfo=timezone.utc)
