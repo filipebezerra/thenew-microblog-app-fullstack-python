@@ -16,6 +16,11 @@ def not_found_error(error):
     return render_template('404.html'), error.code
 
 
+@bp.app_errorhandler(405)
+def method_not_allowed_error(error):
+    return api_error_response(error.code)
+
+
 @bp.app_errorhandler(500)
 def internal_error(error):
     db.session.rollback()
