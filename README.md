@@ -17,4 +17,4 @@ Tech Stack:
 
 The main challenge with this project it is to build and to keep continuously building a real production-ready Full stack web application.
 
-TheNew Microblog is deployed under the URL https://thenew-microblog.herokuapp.com/
+~~TheNew Microblog is deployed under the URL https://thenew-microblog.herokuapp.com/~~
